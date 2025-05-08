@@ -135,7 +135,7 @@
           run: rclone copy --transfers=128 --retries=10 cache:kiwibrowser-next-builds-${{ matrix.platform }}/ "$HOME/kiwibrowser-next-builds-${{ matrix.platform }}"
   
         - name: Transferring build to the standard Kiwi Browser run ID
-          run: rclone copy --transfers=128 --retries=10 cache:kiwibrowser-next-builds-${{ matrix.platform }}/ cache:beasonxu-builds/${{ github.run_id }}/${{ matrix.platform }}
+          run: rclone copy --transfers=128 --retries=10 cache:kiwibrowser-next-builds-${{ matrix.platform }}/ cache:kiwibrowser-builds/${{ github.run_id }}/${{ matrix.platform }}
   
         - name: Listing files
           run: |
@@ -274,10 +274,10 @@
         - name: Downloading artifacts from storage
           if: ${{ github.repository_owner == 'beasonxu' }}
           run: |
-            rclone copy --transfers=128 --retries=100 cache:beasonxu-builds/${{ github.run_id }}/arm/ ./apk-arm 
-            rclone copy --transfers=128 --retries=100 cache:beasonxu-builds/${{ github.run_id }}/arm64/ ./apk-arm64
-            rclone copy --transfers=128 --retries=100 cache:beasonxu-builds/${{ github.run_id }}/x86/ ./apk-x86
-            rclone copy --transfers=128 --retries=100 cache:beasonxu-builds/${{ github.run_id }}/x64/ ./apk-x64
+            rclone copy --transfers=128 --retries=100 cache:kiwibrowser-builds/${{ github.run_id }}/arm/ ./apk-arm 
+            rclone copy --transfers=128 --retries=100 cache:kiwibrowser-builds/${{ github.run_id }}/arm64/ ./apk-arm64
+            rclone copy --transfers=128 --retries=100 cache:kiwibrowser-builds/${{ github.run_id }}/x86/ ./apk-x86
+            rclone copy --transfers=128 --retries=100 cache:kiwibrowser-builds/${{ github.run_id }}/x64/ ./apk-x64
   
         - name: Uploading release asset (arm-signed)
           if: ${{ github.repository_owner == 'beasonxu' }}
