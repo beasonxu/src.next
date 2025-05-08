@@ -92,7 +92,7 @@
   
         - name: Creating rclone config
           run: |
-            mkdir -p $HOME/.config/rclone/
+            mkdir -p "$HOME/.config/rclone/"
             echo '[cache]' > "$HOME/.config/rclone/rclone.conf"
             echo 'type = sftp' >> "$HOME/.config/rclone/rclone.conf"
             echo 'host = ${{ secrets.STORAGE_HOST }}' >> "$HOME/.config/rclone/rclone.conf"
@@ -129,7 +129,7 @@
           run: curl ipinfo.io
   
         - name: "Downloading binary objects cache to $HOME/cache"
-          run: rclone copy --transfers=128 --retries=10 cache:beasonxu-next-builds-${{ matrix.platform }}/ $HOME/beasonxu-next-builds-${{ matrix.platform }}
+          run: rclone copy --transfers=128 --retries=10 cache:beasonxu-next-builds-${{ matrix.platform }}/ "$HOME/beasonxu-next-builds-${{ matrix.platform }}"
   
         - name: Transferring build to the standard Kiwi Browser run ID
           run: rclone copy --transfers=128 --retries=10 cache:beasonxu-next-builds-${{ matrix.platform }}/ cache:beasonxu-builds/${{ github.run_id }}/${{ matrix.platform }}
@@ -159,7 +159,7 @@
             echo '[cache]' > "$HOME/.config/rclone/rclone.conf"
             echo 'type = sftp' >> "$HOME/.config/rclone/rclone.conf"
             echo 'host = ${{ secrets.STORAGE_HOST }}' >> "$HOME/.config/rclone/rclone.conf"
-            echo 'user = storage' >> $HOME/.config/rclone/rclone.conf
+            echo 'user = storage' >> "$HOME/.config/rclone/rclone.conf"
             echo 'key_pem = ${{ secrets.STORAGE_KEY }}' >> "$HOME/.config/rclone/rclone.conf"
   
   
@@ -361,32 +361,4 @@
             asset_path: ./apk-x64/ChromePublic-Next-DevSigned.apk
             asset_name: com.beasonxu.browser.dev-x64-${{ github.run_id }}-github.apk
             asset_content_type: application/vnd.android.package-archive
-  
-        - name: Send announcement on Discord
-          continue-on-error: true
-          if: contains(github.event.inputs.announceOnMessengers, 'yes')
-          run: |
-            echo "" > commit_message.txt
-            echo "" >> commit_message.txt
-            cat ./apk-arm/last_commits.txt >> commit_message.txt
-            echo "" >> commit_message.txt
-            COMMIT_MSG=$(<./commit_message.txt)
-            PAYLOAD=$(jq -n \
-                        --arg username "Kiwi Builder (Next)" \
-                        --arg content "A new build of Kiwi Browser Next (preview version) is available. This version will replace your currently installed Kiwi Browser (com.beasonxu.browser) <@&913196471787065344> - https://github.com/beasonxu/src.next/releases/tag/${{ github.run_id }} $COMMIT_MSG" \
-                        '{username: $username, content: $content}')
-            curl -H 'Content-Type: application/json' -X POST -d "$PAYLOAD" ${{ secrets.DISCORD_WEBHOOK }}
-        
-        - name: Send announcement on Telegram
-          continue-on-error: true
-          if: contains(github.event.inputs.announceOnMessengers, 'yes')
-          run: |
-            COMMIT_MSG=$(<./commit_message.txt)
-            PAYLOAD=$(jq -n \
-                        --arg text "A new build of Kiwi Browser Next (preview version) is available. Link: [${{ github.run_id }}](https://github.com/beasonxu/src.next/releases/tag/${{ github.run_id }}) $COMMIT_MSG" \
-                       # --arg chat_id "@beasonxubuilds" \
-                        --arg parse_mode "markdown" \
-                        --argjson reply_markup '{"inline_keyboard": [[{"text": "x86", "url": "https://github.com/beasonxu/src.next/releases/download/${{ github.run_id }}/com.beasonxu.browser-x86-${{ github.run_id }}-github.apk"},{"text": "x64", "url": "https://github.com/beasonxu/src.next/releases/download/${{ github.run_id }}/com.beasonxu.browser-x64-${{ github.run_id }}-github.apk"}],[{"text": "arm", "url": "https://github.com/beasonxu/src.next/releases/download/${{ github.run_id }}/com.beasonxu.browser-arm-${{ github.run_id }}-github.apk"},{"text": "arm64", "url": "https://github.com/beasonxu/src.next/releases/download/${{ github.run_id }}/com.beasonxu.browser-arm64-${{ github.run_id }}-github.apk"}],[{"text": ".DEV x86", "url": "https://github.com/beasonxu/src.next/releases/download/${{ github.run_id }}/com.beasonxu.browser.dev-x86-${{ github.run_id }}-github.apk"},{"text": ".DEV x64", "url": "https://github.com/beasonxu/src.next/releases/download/${{ github.run_id }}/com.beasonxu.browser.dev-x64-${{ github.run_id }}-github.apk"}],[{"text": ".DEV arm", "url": "https://github.com/beasonxu/src.next/releases/download/${{ github.run_id }}/com.beasonxu.browser.dev-arm-${{ github.run_id }}-github.apk"},{"text": ".DEV arm64", "url": "https://github.com/beasonxu/src.next/releases/download/${{ github.run_id }}/com.beasonxu.browser.dev-arm64-${{ github.run_id }}-github.apk"}]]}' \
-                        '{text: $text, chat_id: $chat_id, parse_mode: $parse_mode, reply_markup: $reply_markup}')
-            curl -H "Content-Type: application/json" -X POST -d "$PAYLOAD" https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage
   
