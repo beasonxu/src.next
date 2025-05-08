@@ -155,7 +155,7 @@
       
         - name: Creating rclone config
           run: |
-            mkdir -p "$HOME/.config/rclone/""
+            mkdir -p "$HOME/.config/rclone/"
             echo '[cache]' > "$HOME/.config/rclone/rclone.conf"
             echo 'type = sftp' >> "$HOME/.config/rclone/rclone.conf"
             echo 'host = ${{ secrets.STORAGE_HOST }}' >> "$HOME/.config/rclone/rclone.conf"
