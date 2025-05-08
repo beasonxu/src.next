@@ -93,11 +93,11 @@
         - name: Creating rclone config
           run: |
             mkdir -p $HOME/.config/rclone/
-            echo '[cache]' > $HOME/.config/rclone/rclone.conf
-            echo 'type = sftp' >> $HOME/.config/rclone/rclone.conf
-            echo 'host = ${{ secrets.STORAGE_HOST }}' >> $HOME/.config/rclone/rclone.conf
-            echo 'user = storage' >> $HOME/.config/rclone/rclone.conf
-            echo 'key_pem = ${{ secrets.STORAGE_KEY }}' >> $HOME/.config/rclone/rclone.conf
+            echo '[cache]' > "$HOME/.config/rclone/rclone.conf"
+            echo 'type = sftp' >> "$HOME/.config/rclone/rclone.conf"
+            echo 'host = ${{ secrets.STORAGE_HOST }}' >> "$HOME/.config/rclone/rclone.conf"
+            echo 'user = storage' >> "$HOME/.config/rclone/rclone.conf"
+            echo 'key_pem = ${{ secrets.STORAGE_KEY }}' >> "$HOME/.config/rclone/rclone.conf"
   
         - name: Modifying args.gn (arm)
           if: matrix.platform == 'arm'
@@ -128,7 +128,7 @@
           if: false
           run: curl ipinfo.io
   
-        - name: Downloading binary objects cache to $HOME/cache
+        - name: "Downloading binary objects cache to $HOME/cache"
           run: rclone copy --transfers=128 --retries=10 cache:beasonxu-next-builds-${{ matrix.platform }}/ $HOME/beasonxu-next-builds-${{ matrix.platform }}
   
         - name: Transferring build to the standard Kiwi Browser run ID
@@ -136,8 +136,8 @@
   
         - name: Listing files
           run: |
-            echo $HOME
-            ls -la $HOME/beasonxu-next-builds-${{ matrix.platform }}
+            echo "$HOME"
+            ls -la "$HOME/beasonxu-next-builds-${{ matrix.platform }}"
   
         - name: Uploading APK
           uses: actions/upload-artifact@v4
@@ -155,12 +155,12 @@
       
         - name: Creating rclone config
           run: |
-            mkdir -p $HOME/.config/rclone/
-            echo '[cache]' > $HOME/.config/rclone/rclone.conf
-            echo 'type = sftp' >> $HOME/.config/rclone/rclone.conf
-            echo 'host = ${{ secrets.STORAGE_HOST }}' >> $HOME/.config/rclone/rclone.conf
+            mkdir -p "$HOME/.config/rclone/""
+            echo '[cache]' > "$HOME/.config/rclone/rclone.conf"
+            echo 'type = sftp' >> "$HOME/.config/rclone/rclone.conf"
+            echo 'host = ${{ secrets.STORAGE_HOST }}' >> "$HOME/.config/rclone/rclone.conf"
             echo 'user = storage' >> $HOME/.config/rclone/rclone.conf
-            echo 'key_pem = ${{ secrets.STORAGE_KEY }}' >> $HOME/.config/rclone/rclone.conf
+            echo 'key_pem = ${{ secrets.STORAGE_KEY }}' >> "$HOME/.config/rclone/rclone.conf"
   
   
         - name: Downloading artifact (arm)
@@ -190,8 +190,8 @@
         - name: Listing files under $HOME
           run: |
             pwd
-            echo $HOME
-            ls -laR $HOME
+            echo "$HOME"
+            ls -laR "$HOME"
   
         - name: Prepare release notes
           run: |
