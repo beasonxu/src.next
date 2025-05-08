@@ -33,7 +33,7 @@ jobs:
     # /dev/disk/azure/root-part1 is / ("slow disk")
     # /dev/disk/azure/resource-part1 is a 14 GB ephemeral SSD disk mounted in /mnt
 
-    # We store the source-code repository (kiwibrowser/src) on /dev/disk/azure/root-part1
+    # We store the source-code repository (beasonxu/src) on /dev/disk/azure/root-part1
     # We store cache, dependencies and output on /dev/disk/azure/resource-part1 (SSD)
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -120,28 +120,28 @@ jobs:
         run: df -h
 
       - name: Uploading args.gn
-        run: rclone copy --transfers=128 --retries=10 secondary_disk/out/android_${{ matrix.platform }}/args.gn cache:kiwibrowser-next-builds-${{ matrix.platform }}/
+        run: rclone copy --transfers=128 --retries=10 secondary_disk/out/android_${{ matrix.platform }}/args.gn cache:beasonxu-next-builds-${{ matrix.platform }}/
 
       - name: Calling buildbot
         if: false
         run: curl ipinfo.io
 
       - name: Downloading binary objects cache to $HOME/cache
-        run: rclone copy --transfers=128 --retries=10 cache:kiwibrowser-next-builds-${{ matrix.platform }}/ $HOME/kiwibrowser-next-builds-${{ matrix.platform }}
+        run: rclone copy --transfers=128 --retries=10 cache:beasonxu-next-builds-${{ matrix.platform }}/ $HOME/beasonxu-next-builds-${{ matrix.platform }}
 
       - name: Transferring build to the standard Kiwi Browser run ID
-        run: rclone copy --transfers=128 --retries=10 cache:kiwibrowser-next-builds-${{ matrix.platform }}/ cache:kiwibrowser-builds/${{ github.run_id }}/${{ matrix.platform }}
+        run: rclone copy --transfers=128 --retries=10 cache:beasonxu-next-builds-${{ matrix.platform }}/ cache:beasonxu-builds/${{ github.run_id }}/${{ matrix.platform }}
 
       - name: Listing files
         run: |
           echo $HOME
-          ls -la $HOME/kiwibrowser-next-builds-${{ matrix.platform }}
+          ls -la $HOME/beasonxu-next-builds-${{ matrix.platform }}
 
       - name: Uploading APK
         uses: actions/upload-artifact@v4
         with:
           name: apk-${{ matrix.platform }}
-          path: /home/runner/kiwibrowser-next-builds-${{ matrix.platform }}/
+          path: /home/runner/beasonxu-next-builds-${{ matrix.platform }}/
 
   sign_and_upload:
     runs-on: ubuntu-latest
@@ -196,14 +196,14 @@ jobs:
           cat ./apk-arm/last_commits.txt > release_notes.txt
           cat <<EOT >> release_notes.txt
           
-          This version will replace your currently installed Kiwi Browser (com.kiwibrowser.browser).
+          This version will replace your currently installed Kiwi Browser (com.beasonxu.browser).
           If you have important data, make sure to backup them or save them before upgrading to this version.
           
           This release was automatically generated from GitHub ${{ github.ref }} in run ID ${{ github.run_id }}.
           
           Summary:
-            - To install / update Kiwi Browser, use "com.kiwibrowser.browser-arm64-${{ github.run_id }}-github.apk".
-            If it doesn't work, try again using "com.kiwibrowser.browser-arm64-${{ github.run_id }}-playstore.apk" (if it exists).
+            - To install / update Kiwi Browser, use "com.beasonxu.browser-arm64-${{ github.run_id }}-github.apk".
+            If it doesn't work, try again using "com.beasonxu.browser-arm64-${{ github.run_id }}-playstore.apk" (if it exists).
           
           Detailed information about the different files:
             - ".map" files are files that developers can use to investigate crashes (ProGuard mapping files), these files are not needed to run the browser and are for developers only.
@@ -211,7 +211,7 @@ jobs:
         
           The filenames are in the form "[PACKAGE_NAME]-[ARCHITECTURE]-[BUILD_VERSION]-[SIGNATURE_TYPE].apk"
         
-          If you want to keep the Play Store version installed, and still try the GitHub edition then you can install the APKs starting with "com.kiwibrowser.browser.dev" (you will keep all your Play Store bookmarks, settings and passwords, and the GitHub edition will be installed separately).
+          If you want to keep the Play Store version installed, and still try the GitHub edition then you can install the APKs starting with "com.beasonxu.browser.dev" (you will keep all your Play Store bookmarks, settings and passwords, and the GitHub edition will be installed separately).
           
           Build version:
            - Everytime a change is introduced in Kiwi Browser, a new build version is generated.
@@ -251,7 +251,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          owner: "kiwibrowser"
+          owner: "beasonxu"
           repo: "src.next"
           tag_name: ${{ github.run_id }}
           release_name: Generation ${{ github.run_id }}
@@ -260,104 +260,104 @@ jobs:
           body_path: release_notes.txt
 
       - name: Signing and uploading release to GitHub and send to the Play Store
-        if: ${{ github.repository_owner == 'kiwibrowser' && contains(github.event.inputs.prepareRelease, 'yes') }}
+        if: ${{ github.repository_owner == 'beasonxu' && contains(github.event.inputs.prepareRelease, 'yes') }}
         run: |
           curl 'https://${{ secrets.RELEASE_HOST }}/?run_id=${{ github.run_id }}&dk=${{ secrets.DEPLOY_KEY }}&publish=1&target=aab'
 
       - name: Downloading artifacts from storage
-        if: ${{ github.repository_owner == 'kiwibrowser' }}
+        if: ${{ github.repository_owner == 'beasonxu' }}
         run: |
-          rclone copy --transfers=128 --retries=100 cache:kiwibrowser-builds/${{ github.run_id }}/arm/ ./apk-arm 
-          rclone copy --transfers=128 --retries=100 cache:kiwibrowser-builds/${{ github.run_id }}/arm64/ ./apk-arm64
-          rclone copy --transfers=128 --retries=100 cache:kiwibrowser-builds/${{ github.run_id }}/x86/ ./apk-x86
-          rclone copy --transfers=128 --retries=100 cache:kiwibrowser-builds/${{ github.run_id }}/x64/ ./apk-x64
+          rclone copy --transfers=128 --retries=100 cache:beasonxu-builds/${{ github.run_id }}/arm/ ./apk-arm 
+          rclone copy --transfers=128 --retries=100 cache:beasonxu-builds/${{ github.run_id }}/arm64/ ./apk-arm64
+          rclone copy --transfers=128 --retries=100 cache:beasonxu-builds/${{ github.run_id }}/x86/ ./apk-x86
+          rclone copy --transfers=128 --retries=100 cache:beasonxu-builds/${{ github.run_id }}/x64/ ./apk-x64
 
       - name: Uploading release asset (arm-signed)
-        if: ${{ github.repository_owner == 'kiwibrowser' }}
+        if: ${{ github.repository_owner == 'beasonxu' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./apk-arm/ChromePublic-DevSigned.apk
-          asset_name: com.kiwibrowser.browser-arm-${{ github.run_id }}-github.apk
+          asset_name: com.beasonxu.browser-arm-${{ github.run_id }}-github.apk
           asset_content_type: application/vnd.android.package-archive
 
       - name: Uploading release asset (arm64-signed)
-        if: ${{ github.repository_owner == 'kiwibrowser' }}
+        if: ${{ github.repository_owner == 'beasonxu' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./apk-arm64/ChromePublic-DevSigned.apk
-          asset_name: com.kiwibrowser.browser-arm64-${{ github.run_id }}-github.apk
+          asset_name: com.beasonxu.browser-arm64-${{ github.run_id }}-github.apk
           asset_content_type: application/vnd.android.package-archive
 
       - name: Uploading release asset (x86-signed)
-        if: ${{ github.repository_owner == 'kiwibrowser' }}
+        if: ${{ github.repository_owner == 'beasonxu' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./apk-x86/ChromePublic-DevSigned.apk
-          asset_name: com.kiwibrowser.browser-x86-${{ github.run_id }}-github.apk
+          asset_name: com.beasonxu.browser-x86-${{ github.run_id }}-github.apk
           asset_content_type: application/vnd.android.package-archive
 
       - name: Uploading release asset (x64-signed)
-        if: ${{ github.repository_owner == 'kiwibrowser' }}
+        if: ${{ github.repository_owner == 'beasonxu' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./apk-x64/ChromePublic-DevSigned.apk
-          asset_name: com.kiwibrowser.browser-x64-${{ github.run_id }}-github.apk
+          asset_name: com.beasonxu.browser-x64-${{ github.run_id }}-github.apk
           asset_content_type: application/vnd.android.package-archive
 
       - name: Uploading dev asset (arm-signed)
-        if: ${{ github.repository_owner == 'kiwibrowser' }}
+        if: ${{ github.repository_owner == 'beasonxu' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./apk-arm/ChromePublic-Next-DevSigned.apk
-          asset_name: com.kiwibrowser.browser.dev-arm-${{ github.run_id }}-github.apk
+          asset_name: com.beasonxu.browser.dev-arm-${{ github.run_id }}-github.apk
           asset_content_type: application/vnd.android.package-archive
 
       - name: Uploading dev asset (arm64-signed)
-        if: ${{ github.repository_owner == 'kiwibrowser' }}
+        if: ${{ github.repository_owner == 'beasonxu' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./apk-arm64/ChromePublic-Next-DevSigned.apk
-          asset_name: com.kiwibrowser.browser.dev-arm64-${{ github.run_id }}-github.apk
+          asset_name: com.beasonxu.browser.dev-arm64-${{ github.run_id }}-github.apk
           asset_content_type: application/vnd.android.package-archive
 
       - name: Uploading dev asset (x86-signed)
-        if: ${{ github.repository_owner == 'kiwibrowser' }}
+        if: ${{ github.repository_owner == 'beasonxu' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./apk-x86/ChromePublic-Next-DevSigned.apk
-          asset_name: com.kiwibrowser.browser.dev-x86-${{ github.run_id }}-github.apk
+          asset_name: com.beasonxu.browser.dev-x86-${{ github.run_id }}-github.apk
           asset_content_type: application/vnd.android.package-archive
 
       - name: Uploading dev asset (x64-signed)
-        if: ${{ github.repository_owner == 'kiwibrowser' }}
+        if: ${{ github.repository_owner == 'beasonxu' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./apk-x64/ChromePublic-Next-DevSigned.apk
-          asset_name: com.kiwibrowser.browser.dev-x64-${{ github.run_id }}-github.apk
+          asset_name: com.beasonxu.browser.dev-x64-${{ github.run_id }}-github.apk
           asset_content_type: application/vnd.android.package-archive
 
       - name: Send announcement on Discord
@@ -371,7 +371,7 @@ jobs:
           COMMIT_MSG=$(<./commit_message.txt)
           PAYLOAD=$(jq -n \
                       --arg username "Kiwi Builder (Next)" \
-                      --arg content "A new build of Kiwi Browser Next (preview version) is available. This version will replace your currently installed Kiwi Browser (com.kiwibrowser.browser) <@&913196471787065344> - https://github.com/kiwibrowser/src.next/releases/tag/${{ github.run_id }} $COMMIT_MSG" \
+                      --arg content "A new build of Kiwi Browser Next (preview version) is available. This version will replace your currently installed Kiwi Browser (com.beasonxu.browser) <@&913196471787065344> - https://github.com/beasonxu/src.next/releases/tag/${{ github.run_id }} $COMMIT_MSG" \
                       '{username: $username, content: $content}')
           curl -H 'Content-Type: application/json' -X POST -d "$PAYLOAD" ${{ secrets.DISCORD_WEBHOOK }}
       
@@ -381,10 +381,9 @@ jobs:
         run: |
           COMMIT_MSG=$(<./commit_message.txt)
           PAYLOAD=$(jq -n \
-                      --arg text "A new build of Kiwi Browser Next (preview version) is available. Link: [${{ github.run_id }}](https://github.com/kiwibrowser/src.next/releases/tag/${{ github.run_id }}) $COMMIT_MSG" \
-                      --arg chat_id "@kiwibrowserbuilds" \
+                      --arg text "A new build of Kiwi Browser Next (preview version) is available. Link: [${{ github.run_id }}](https://github.com/beasonxu/src.next/releases/tag/${{ github.run_id }}) $COMMIT_MSG" \
+                      --arg chat_id "@beasonxubuilds" \
                       --arg parse_mode "markdown" \
-                      --argjson reply_markup '{"inline_keyboard": [[{"text": "x86", "url": "https://github.com/kiwibrowser/src.next/releases/download/${{ github.run_id }}/com.kiwibrowser.browser-x86-${{ github.run_id }}-github.apk"},{"text": "x64", "url": "https://github.com/kiwibrowser/src.next/releases/download/${{ github.run_id }}/com.kiwibrowser.browser-x64-${{ github.run_id }}-github.apk"}],[{"text": "arm", "url": "https://github.com/kiwibrowser/src.next/releases/download/${{ github.run_id }}/com.kiwibrowser.browser-arm-${{ github.run_id }}-github.apk"},{"text": "arm64", "url": "https://github.com/kiwibrowser/src.next/releases/download/${{ github.run_id }}/com.kiwibrowser.browser-arm64-${{ github.run_id }}-github.apk"}],[{"text": ".DEV x86", "url": "https://github.com/kiwibrowser/src.next/releases/download/${{ github.run_id }}/com.kiwibrowser.browser.dev-x86-${{ github.run_id }}-github.apk"},{"text": ".DEV x64", "url": "https://github.com/kiwibrowser/src.next/releases/download/${{ github.run_id }}/com.kiwibrowser.browser.dev-x64-${{ github.run_id }}-github.apk"}],[{"text": ".DEV arm", "url": "https://github.com/kiwibrowser/src.next/releases/download/${{ github.run_id }}/com.kiwibrowser.browser.dev-arm-${{ github.run_id }}-github.apk"},{"text": ".DEV arm64", "url": "https://github.com/kiwibrowser/src.next/releases/download/${{ github.run_id }}/com.kiwibrowser.browser.dev-arm64-${{ github.run_id }}-github.apk"}]]}' \
+                      --argjson reply_markup '{"inline_keyboard": [[{"text": "x86", "url": "https://github.com/beasonxu/src.next/releases/download/${{ github.run_id }}/com.beasonxu.browser-x86-${{ github.run_id }}-github.apk"},{"text": "x64", "url": "https://github.com/beasonxu/src.next/releases/download/${{ github.run_id }}/com.beasonxu.browser-x64-${{ github.run_id }}-github.apk"}],[{"text": "arm", "url": "https://github.com/beasonxu/src.next/releases/download/${{ github.run_id }}/com.beasonxu.browser-arm-${{ github.run_id }}-github.apk"},{"text": "arm64", "url": "https://github.com/beasonxu/src.next/releases/download/${{ github.run_id }}/com.beasonxu.browser-arm64-${{ github.run_id }}-github.apk"}],[{"text": ".DEV x86", "url": "https://github.com/beasonxu/src.next/releases/download/${{ github.run_id }}/com.beasonxu.browser.dev-x86-${{ github.run_id }}-github.apk"},{"text": ".DEV x64", "url": "https://github.com/beasonxu/src.next/releases/download/${{ github.run_id }}/com.beasonxu.browser.dev-x64-${{ github.run_id }}-github.apk"}],[{"text": ".DEV arm", "url": "https://github.com/beasonxu/src.next/releases/download/${{ github.run_id }}/com.beasonxu.browser.dev-arm-${{ github.run_id }}-github.apk"},{"text": ".DEV arm64", "url": "https://github.com/beasonxu/src.next/releases/download/${{ github.run_id }}/com.beasonxu.browser.dev-arm64-${{ github.run_id }}-github.apk"}]]}' \
                       '{text: $text, chat_id: $chat_id, parse_mode: $parse_mode, reply_markup: $reply_markup}')
           curl -H "Content-Type: application/json" -X POST -d "$PAYLOAD" https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage
-
