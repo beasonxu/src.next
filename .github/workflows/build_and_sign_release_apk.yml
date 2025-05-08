@@ -125,28 +125,28 @@
           run: df -h
   
         - name: Uploading args.gn
-          run: rclone copy --transfers=128 --retries=10 secondary_disk/out/android_${{ matrix.platform }}/args.gn cache:beasonxu-next-builds-${{ matrix.platform }}/
+          run: rclone copy --transfers=128 --retries=10 secondary_disk/out/android_${{ matrix.platform }}/args.gn cache:kiwibrowser-next-builds-${{ matrix.platform }}/
   
         - name: Calling buildbot
           if: false
           run: curl ipinfo.io
   
         - name: "Downloading binary objects cache to $HOME/cache"
-          run: rclone copy --transfers=128 --retries=10 cache:beasonxu-next-builds-${{ matrix.platform }}/ "$HOME/beasonxu-next-builds-${{ matrix.platform }}"
+          run: rclone copy --transfers=128 --retries=10 cache:kiwibrowser-next-builds-${{ matrix.platform }}/ "$HOME/kiwibrowser-next-builds-${{ matrix.platform }}"
   
         - name: Transferring build to the standard Kiwi Browser run ID
-          run: rclone copy --transfers=128 --retries=10 cache:beasonxu-next-builds-${{ matrix.platform }}/ cache:beasonxu-builds/${{ github.run_id }}/${{ matrix.platform }}
+          run: rclone copy --transfers=128 --retries=10 cache:kiwibrowser-next-builds-${{ matrix.platform }}/ cache:beasonxu-builds/${{ github.run_id }}/${{ matrix.platform }}
   
         - name: Listing files
           run: |
             echo "$HOME"
-            ls -la "$HOME/beasonxu-next-builds-${{ matrix.platform }}"
+            ls -la "$HOME/kiwibrowser-next-builds-${{ matrix.platform }}"
   
         - name: Uploading APK
           uses: actions/upload-artifact@v4
           with:
             name: apk-${{ matrix.platform }}
-            path: /home/runner/beasonxu-next-builds-${{ matrix.platform }}/
+            path: /home/runner/kiwibrowser-next-builds-${{ matrix.platform }}/
   
     sign_and_upload:
       runs-on: ubuntu-latest
