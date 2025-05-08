@@ -1,3 +1,6 @@
+---
+# yamllint disable-line rule:truthy
+
 # Build APKs for Kiwi Browser Next
 name: 'Kiwi: Build and sign release apk'
 
