@@ -94,11 +94,13 @@
         - name: Creating rclone config
           run: |
             mkdir -p "$HOME/.config/rclone/"
-            echo '[cache]' > "$HOME/.config/rclone/rclone.conf"
-            echo 'type = sftp' >> "$HOME/.config/rclone/rclone.conf"
-            echo 'host = ${{ secrets.STORAGE_HOST }}' >> "$HOME/.config/rclone/rclone.conf"
-            echo 'user = storage' >> "$HOME/.config/rclone/rclone.conf"
-            echo 'key_pem = ${{ secrets.STORAGE_KEY }}' >> "$HOME/.config/rclone/rclone.conf"
+            {
+              echo '[cache]'
+              echo 'type = sftp'
+              echo "host = ${{ secrets.STORAGE_HOST }}"
+              echo 'user = storage'
+              echo "key_pem = ${{ secrets.STORAGE_KEY }}"
+            } > "$HOME/.config/rclone/rclone.conf"
   
         - name: Modifying args.gn (arm)
           if: matrix.platform == 'arm'
