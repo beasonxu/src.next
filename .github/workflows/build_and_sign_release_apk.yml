@@ -123,6 +123,11 @@
   
         - name: Checking available disk-space
           run: df -h
+
+        - name: 启动SSH代理并添加密钥
+          run: |
+            eval $(ssh-agent -s)
+            ssh-add ~/.ssh/id_rsa
   
         - name: Uploading args.gn
           run: rclone copy --transfers=128 --retries=10 secondary_disk/out/android_${{ matrix.platform }}/args.gn cache:kiwibrowser-next-builds-${{ matrix.platform }}/
