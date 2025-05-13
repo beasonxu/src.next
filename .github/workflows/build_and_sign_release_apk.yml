@@ -88,16 +88,29 @@ jobs:
       - name: Copying args.gn to target folder
         run: sed "s#target_cpu = \"arm\"#target_cpu = \"${{ matrix.platform }}\"#" < .build/android_arm/args.gn | sed "s#android_default_version_name = \"Git\"#android_default_version_name = \"Git$(date '+%y%m%d')Gen${{ github.run_id }}\"#" > secondary_disk/out/android_${{ matrix.platform }}/args.gn
 
+      # [oss]
+      # type = s3
+      # provider = Alibaba
+      # access_key_id = 此处改为你的 access_key_id
+      # secret_access_key = 此处改为你的 secret_access_key
+      # endpoint = https://oss-cn-zhangjiakou-internal.aliyuncs.com 此处请根据你oss所在地区分配的地域节点配置
+      # acl = public-read
+      # storage_class = STANDARD
+      # bucket_acl = public-read
 
       - name: Creating rclone config
         run: |
           mkdir -p "$HOME/.config/rclone/"
           {
             echo '[cache]'
-            echo 'type = sftp'
-            echo "host = ${{ secrets.STORAGE_HOST }}"
-            echo 'user = storage'
-            echo "key_pem = ${{ secrets.STORAGE_KEY }}"
+            echo 'type = s3'
+            echo 'provider = Alibaba'
+            echo 'endpoint = https://oss-ap-southeast-1.aliyuncs.com'
+            echo "access_key_id = ${{ secrets.access_key_id }}"
+            echo "secret_access_key = ${{ secrets.secret_access_key }}"
+            echo 'acl =  public-read'
+            echo 'storage_class = STANDARD'
+            echo 'bucket_acl = public-read'
           } > "$HOME/.config/rclone/rclone.conf"
 
       - name: Modifying args.gn (arm)
