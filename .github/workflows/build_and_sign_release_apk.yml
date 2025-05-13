@@ -105,12 +105,14 @@ jobs:
             echo '[cache]'
             echo 'type = s3'
             echo 'provider = Alibaba'
-            echo 'env_auth = false'
             echo 'endpoint = https://oss-ap-southeast-1.aliyuncs.com'
+            echo 'subdomain = oss-singpo'
             echo "access_key_id = ${{ secrets.ACCESS_KEY_ID }}"
             echo "secret_access_key = ${{ secrets.SECRET_ACCESS_KEY }}"
-            echo 'acl =  private'
+            echo 'acl =  public-read'
             echo 'storage_class = STANDARD'
+            echo 'bucket_acl = public-read'
+            
           } > "$HOME/.config/rclone/rclone.conf"
 
       - name: Modifying args.gn (arm)
