@@ -162,6 +162,10 @@ jobs:
 
   sign_and_upload:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
     needs: build
 
     steps:
