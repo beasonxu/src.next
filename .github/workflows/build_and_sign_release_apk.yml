@@ -70,7 +70,7 @@ jobs:
       - name: On SSD - Creating symlink on /dev/disk/azure/root-part1 pointing to /dev/disk/azure/resource-part1
         run: |
           sudo ln -s /extended_data /mnt/secondary_disk
-          sudo ln -s /mnt/secondary_disk "$GITHUB_WORKSPACE/"
+          sudo ln -s /mnt/secondary_disk ${{ github.workspace }}/
       # or alternatively, to work on the main partition
       # - name: On HDD - Creating symlink on /dev/disk/azure/root-part1 pointing to /dev/disk/azure/resource-part1
       #  run: |
@@ -86,7 +86,7 @@ jobs:
         run: keytool -genkey -v -keystore keystore.jks -alias dev -keyalg RSA -keysize 2048 -validity 10000 -storepass public_password -keypass public_password -dname "cn=Kiwi Browser (unverified), ou=Actions, o=Kiwi Browser, c=GitHub"
 
       - name: Copying args.gn to target folder
-        run: sed "s#target_cpu = \"arm\"#target_cpu = \"${{ matrix.platform }}\"#" < .build/android_arm/args.gn | sed "s#android_default_version_name = \"Git\"#android_default_version_name = \"Git$(date '+%y%m%d')Gen${{ github.run_id }}\"#" > secondary_disk/out/android_${{ matrix.platform }}/args.gn
+        run: cat .build/android_arm/args.gn | sed "s#target_cpu = \"arm\"#target_cpu = \"${{ matrix.platform }}\"#" | sed "s#android_default_version_name = \"Git\"#android_default_version_name = \"Git$(date '+%y%m%d')Gen${{ github.run_id }}\"#" > secondary_disk/out/android_${{ matrix.platform }}/args.gn
 
       # [oss]
       # type = s3
