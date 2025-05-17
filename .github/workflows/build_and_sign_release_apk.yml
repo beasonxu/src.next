@@ -221,7 +221,7 @@ jobs:
 
       - name: Prepare release notes
         run: |
-          cat ./apk-arm/last_commits.txt > release_notes.txt
+          # cat ./apk-arm/last_commits.txt > release_notes.txt
           cat <<EOT >> release_notes.txt
           
           This version will replace your currently installed Kiwi Browser (com.beasonxu.browser).
